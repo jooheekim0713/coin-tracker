@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -19,17 +18,6 @@ const Header = styled.header`
 
 const CoinsList = styled.ul``;
 
-const coins = [
-  {
-    id: 'btc-bitcoin',
-    name: 'Bitcoin',
-    symbol: 'BTC',
-    rank: 1,
-    is_new: false,
-    is_active: true,
-    type: 'coin',
-  },
-];
 const Coin = styled.li`
   background-color: white;
   color: ${(props) => props.theme.bgColor};
