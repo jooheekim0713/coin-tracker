@@ -8,8 +8,10 @@ import {
   useParams,
   useRouteMatch,
 } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { fetchCoinInfo, fetchCoinTickers } from '../api';
+import { isDarkAtom } from '../atom';
 import Chart from './Chart';
 import Price from './Price';
 
@@ -143,12 +145,9 @@ interface PriceData {
   };
 }
 
-interface ICoinsProps {
-  toggleDark: () => void;
-  isDark: boolean;
-}
-
-function Coin({ toggleDark, isDark }: ICoinsProps) {
+function Coin() {
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+  const toggleDarkAtom = () => setDarkAtom((prev) => !prev);
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
   const priceMatch = useRouteMatch('/:coinId/price');
@@ -177,7 +176,7 @@ function Coin({ toggleDark, isDark }: ICoinsProps) {
       <Header>
         <Title>
           {state?.name ? state.name : loading ? 'Loading...' : infoData?.name}
-          <button onClick={toggleDark}>Toggle Mode</button>
+          <button onClick={toggleDarkAtom}>Toggle Button</button>
         </Title>
       </Header>
       {loading ? (
@@ -222,7 +221,7 @@ function Coin({ toggleDark, isDark }: ICoinsProps) {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart isDark={isDark} coinId={coinId} />
+              <Chart coinId={coinId} />
             </Route>
           </Switch>
         </>
