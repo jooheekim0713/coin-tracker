@@ -28,6 +28,7 @@ const Header = styled.header`
 
 const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
+  font-size: 36px;
 `;
 
 const Loader = styled.span`
@@ -142,7 +143,12 @@ interface PriceData {
   };
 }
 
-function Coin() {
+interface ICoinsProps {
+  toggleDark: () => void;
+  isDark: boolean;
+}
+
+function Coin({ toggleDark, isDark }: ICoinsProps) {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
   const priceMatch = useRouteMatch('/:coinId/price');
@@ -171,6 +177,7 @@ function Coin() {
       <Header>
         <Title>
           {state?.name ? state.name : loading ? 'Loading...' : infoData?.name}
+          <button onClick={toggleDark}>Toggle Mode</button>
         </Title>
       </Header>
       {loading ? (
@@ -215,7 +222,7 @@ function Coin() {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart coinId={coinId} />
+              <Chart isDark={isDark} coinId={coinId} />
             </Route>
           </Switch>
         </>
