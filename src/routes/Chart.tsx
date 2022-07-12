@@ -10,7 +10,7 @@ interface IHistorical {
   open: string;
   high: string;
   low: string;
-  close: number;
+  close: string;
   volume: string;
   market_cap: number;
 }
@@ -19,22 +19,38 @@ interface ChartProps {
   coinId: string;
 }
 
+interface IChartAxis {
+  x: Date;
+  y: number[];
+}
+
 function Chart({ coinId }: ChartProps) {
   const isDark = useRecoilValue(isDarkAtom);
   const { isLoading, data } = useQuery<IHistorical[]>(['ohlcv', coinId], () =>
     fetchCoinHistory(coinId)
   );
+
   return (
     <div>
       {isLoading ? (
         'loading chart'
       ) : (
         <ApexChart
-          type="line"
+          type="candlestick"
           series={[
             {
               name: 'Price',
-              data: data?.map((price) => price.close) as number[],
+              data: data?.map((props) => {
+                return {
+                  x: new Date(props.time_open * 1000),
+                  y: [
+                    parseFloat(props.open),
+                    parseFloat(props.high),
+                    parseFloat(props.low),
+                    parseFloat(props.close),
+                  ],
+                };
+              }) as IChartAxis[],
             },
           ]}
           options={{
@@ -57,10 +73,9 @@ function Chart({ coinId }: ChartProps) {
             xaxis: {
               labels: { show: false },
               axisTicks: { show: false },
-              categories: data?.map((price) =>
-                new Date(price.time_close * 1000).toLocaleDateString('ko')
-              ),
+              type: 'datetime',
             },
+            yaxis: { show: false },
             theme: {
               mode: isDark ? 'dark' : 'light',
             },

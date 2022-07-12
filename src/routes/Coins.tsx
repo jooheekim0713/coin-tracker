@@ -1,7 +1,7 @@
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { fetchCoins } from '../api';
 import { isDarkAtom } from '../atom';
@@ -13,10 +13,25 @@ const Container = styled.div`
 `;
 
 const Header = styled.header`
+  width: 100%;
   height: 15vh;
+  display: grid;
+  grid-template-columns: repeat(1, 10% 1fr 10%);
+`;
+
+const HeaderContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const Button = styled.div`
+  font-size: 1.5em;
+  border: none;
+  border-radius: 1em;
+  background-color: ${(props) => props.theme.textColor};
+  cursor: pointer;
+  padding: 5px 10px;
 `;
 
 const CoinsList = styled.ul``;
@@ -26,7 +41,7 @@ const Coin = styled.li`
   color: ${(props) => props.theme.textColor};
   border-radius: 15px;
   margin-bottom: 10px;
-  border: 1px solid white;
+  border: 1px solid ${(props) => props.theme.cardBorderColor};
   a {
     display: flex;
     align-items: center;
@@ -67,9 +82,10 @@ interface ICoin {
 }
 
 function Coins() {
+  const { isLoading, data } = useQuery<ICoin[]>('allCoins', fetchCoins);
+  const isDark = useRecoilValue(isDarkAtom);
   const setDarkAtom = useSetRecoilState(isDarkAtom);
   const toggleDarkAtom = () => setDarkAtom((prev) => !prev);
-  const { isLoading, data } = useQuery<ICoin[]>('allCoins', fetchCoins);
   return (
     <Container>
       <HelmetProvider>
@@ -78,8 +94,13 @@ function Coins() {
         </Helmet>
       </HelmetProvider>
       <Header>
-        <Title>Coins</Title>
-        <button onClick={toggleDarkAtom}>Toggle Button</button>
+        <HeaderContainer></HeaderContainer>
+        <HeaderContainer>
+          <Title>Coins</Title>
+        </HeaderContainer>
+        <HeaderContainer>
+          <Button onClick={toggleDarkAtom}>{isDark ? '🌞 ' : '🌜'}</Button>
+        </HeaderContainer>
       </Header>
       {isLoading ? (
         <Loader>loading...</Loader>
